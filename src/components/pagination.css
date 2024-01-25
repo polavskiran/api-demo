@@ -1,0 +1,5 @@
+.pagination {
+    display: grid;
+    list-style: none;
+    align-items: center;
+}

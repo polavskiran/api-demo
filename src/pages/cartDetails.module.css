@@ -1,0 +1,32 @@
+.parentDiv {
+  border: 1px solid black;
+  border-radius: 5px;
+  border-color: cornflowerblue;
+  margin: 1rem;
+  padding: 1rem 1rem;
+  text-align: center;
+  height: 6rem;
+}
+
+.childDiv {
+  display: inline-block;
+  border: 0.5px solid rgb(74, 104, 19);
+  margin-right: 0.5rem;
+  padding: 1rem 1rem;
+  vertical-align: middle;
+  height: 4rem;
+}
+
+.grid-container-element {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 20px;
+  border: 1px solid cornflowerblue;
+  width: 100%;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+  /* background-color: #f5be67; */
+}
+.grid-child-element {
+  margin: 10px;
+}
