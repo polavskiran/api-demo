@@ -29,6 +29,7 @@ export const MenuBar = () => {
   const categories = useSelector((state) => state.products.categories);
   const openCartDialog = useSelector((state) => state.cart.openDialog);
   const catItems = useSelector((state) => state.cart.cart);
+  console.log("catItems= ",catItems);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);

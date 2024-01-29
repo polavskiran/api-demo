@@ -6,6 +6,7 @@ const INITIAL_CART_STATE = {
   totalProducts: null,
   totalQuantity: null,
   totalPrice: null,
+  discountedTotal: null,
   openDialog: false,
 };
 
@@ -16,7 +17,7 @@ export const addProductToCart = createAsyncThunk(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        userId: 1,
+        userId: 2,
         products: [...products],
       }),
     })
@@ -58,19 +59,87 @@ export const cartSlice = createSlice({
     setOpenDialog: (state, action) => {
       state.openDialog = action.payload;
     },
+    resetCartState: (state, action) => {
+      state.cart = action.payload;
+      state.totalPrice = 0;
+      state.totalProducts = 0;
+      state.totalQuantity = 0;
+      state.discountedTotal = 0;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(addProductToCart.fulfilled, (state, action) => {
-      const objResponse = action.payload;
-      console.log("objResponse= ", objResponse);
+      let objResponse = { ...action.payload };
+      objResponse = {
+        [objResponse.id]: { ...objResponse },
+      };
+      const objKey = Object.keys(objResponse);
 
       // get existing cart details
       const existingCart = [...state.cart];
-      const isProductExists = existingCart[objResponse.id].products.findIndex((product) => product.id === objResponse.products[0].id);
 
+      if (existingCart.length === 0) {
+        state.cart = [{ ...objResponse }];
+      } else {
+        let updatedObject = {};
+        existingCart.forEach((obj, index, array) => {
+          if (obj[objKey]) {
+            const products = [...obj[objKey].products];
+
+            // Verify if product is already exists
+            const index = products.findIndex(
+              (product) => product.id === objResponse[objKey].products[0].id
+            );
+            if (index >= 0) {
+              products.splice(index, 1, ...objResponse[objKey].products);
+            } else {
+              products.push(...objResponse[objKey].products);
+            }
+
+            // products.push(...objResponse[objKey].products);
+            // console.log("new products= ",products);
+            updatedObject = {
+              ...obj,
+              [objKey]: {
+                ...objResponse[objKey],
+                products,
+              },
+            };
+          }
+        });
+        state.cart = [{ ...updatedObject }];
+        console.log("Cart products= ", { ...updatedObject });
+        const productDetails = getProductDetails(
+          [...updatedObject[objKey].products]
+        );
+        state.totalPrice = productDetails?.totalPrice;
+        state.totalQuantity = productDetails?.totalQuantity;
+        state.discountedTotal = productDetails?.discountedTotal;
+        state.totalProducts = productDetails?.totalProducts;
+      }
+      // const productDetails = getProductDetails(...state?.cart[objKey]?.products);
+      // state.totalPrice = productDetails?.totalPrice;
+      // state.totalQuantity = productDetails?.totalQuantity;
+      // state.discountedTotal = productDetails?.discountedTotal;
+      // state.totalProducts = productDetails?.totalProducts;
     });
   },
 });
 
-export const { addProduct, setOpenDialog } = cartSlice.actions;
+const getProductDetails = (productsArray) => {
+  console.log("productsArray= ", productsArray);
+  return productsArray.reduce(
+    (acc, obj, index) => {
+      return {
+        totalPrice: acc?.totalPrice + obj.total,
+        totalQuantity: acc?.totalQuantity + obj.quantity,
+        discountedTotal: acc?.discountedTotal + obj.discountedPrice,
+        totalProducts: acc?.totalProducts + (index === 0 ? 1 : index),
+      };
+    },
+    { totalPrice: 0, totalQuantity: 0, discountedTotal: 0, totalProducts: 0 }
+  );
+};
+
+export const { addProduct, setOpenDialog, resetCartState } = cartSlice.actions;
 export const cartReducer = cartSlice.reducer;
