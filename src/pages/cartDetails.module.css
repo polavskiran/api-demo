@@ -19,14 +19,20 @@
 
 .grid-container-element {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: 20px;
+  grid-template-columns: 2fr 1fr;
+  /*grid-gap: 20px;*/
   border: 1px solid cornflowerblue;
-  width: 100%;
+  width: 550px;
   border-radius: 5px;
   margin-bottom: 1rem;
   /* background-color: #f5be67; */
 }
-.grid-child-element {
+.grid-child-element1 {
   margin: 10px;
+  width: 100%;
+}
+
+.grid-child-element2 {
+  margin: 10px;
+  width: 100%;
 }

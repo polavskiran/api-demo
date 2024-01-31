@@ -69,7 +69,7 @@ function App() {
         },
         {
           path: "logout",
-          element: <></>,
+          element: <Login />,
           action: logoutAction,
         },
       ],

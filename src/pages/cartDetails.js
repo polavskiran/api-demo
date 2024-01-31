@@ -15,7 +15,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import classes from "./cartDetails.module.css";
-import { addProductToCart } from "../reduxModule/cartSlice";
+import { addProductToCart, deleteProductFromCart } from "../reduxModule/cartSlice";
 
 export const CartDetails = (props) => {
   const { open, closeDialog } = props;
@@ -25,18 +25,31 @@ export const CartDetails = (props) => {
   const carTotalPrice = useSelector((state) => state.cart.discountedTotal);
   const [cartState, setCartState] = useState(cartInfo);
 
-  const updateCartDetails = (itemId) => {
+  const updateCartDetails = (itemId, action) => {
     const existingCart = [...cartInfo];
     let newProductDetails = {};
     existingCart.forEach((cart) => {
       Object.values(cart).forEach((cartDetails) => {
-        const index = cartDetails.products.findIndex((item) => item.id === itemId);
+        const index = cartDetails.products.findIndex(
+          (item) => item.id === itemId
+        );
         console.log(index);
-        let newQuantity = cartDetails.products[index].quantity;
-
         if (index !== -1) {
-          newQuantity = cartDetails.products[index].quantity + 1;
+          let newQuantity = cartDetails.products[index].quantity;
+          newQuantity =
+            action === "add"
+              ? cartDetails.products[index].quantity + 1
+              : cartDetails.products[index].quantity - 1;
           // existingCart[index].quantity = newQuantity;
+          /*if (newQuantity === 0) {
+            return dispatch(deleteProductFromCart({productid: itemId}));
+          } else {
+            newProductDetails = {
+              id: itemId,
+              quantity: newQuantity,
+            };
+          }*/
+
           newProductDetails = {
             id: itemId,
             quantity: newQuantity,
@@ -45,20 +58,6 @@ export const CartDetails = (props) => {
         dispatch(addProductToCart({ products: [{ ...newProductDetails }] }));
       });
     });
-    /* let index = existingCart.findIndex((cart) => cart.id === itemId);
-    let newQuantity = existingCart[index].quantity;
-    console.log("index= ", index);
-    if (index !== -1) {
-      newQuantity = existingCart[index].quantity + 1;
-      console.log("newQuantity= ", newQuantity);
-      // existingCart[index].quantity = newQuantity;
-      newProductDetails = {
-        id: itemId,
-        quantity: newQuantity,
-      };
-      console.log("newProductDetails= ", newProductDetails);
-    }
-    dispatch(addProductToCart({ products: [{ ...newProductDetails }] })); */
   };
 
   return (
@@ -71,19 +70,24 @@ export const CartDetails = (props) => {
               return (
                 <>
                   <div className={classes["grid-container-element"]}>
-                    <div className={classes["grid-child-element"]}>
+                    <div className={classes["grid-child-element1"]}>
                       <span>
                         <InputLabel htmlFor={item.title} variant="outlined">
                           {item.title}
                         </InputLabel>
                       </span>
                     </div>
-                    <div className={classes["grid-child-element"]}>
+                    <div className={classes["grid-child-element2"]}>
                       <IconButton
                         color="primary"
                         aria-label="decrease quantity"
                       >
-                        <RemoveIcon />
+                        <RemoveIcon
+                          onClick={() => {
+                            // addRemoveActionHandler(item.id, "add");
+                            updateCartDetails(item.id, "remove");
+                          }}
+                        />
                       </IconButton>
                       <TextField
                         id={item.id}
@@ -99,7 +103,7 @@ export const CartDetails = (props) => {
                         <AddIcon
                           onClick={() => {
                             // addRemoveActionHandler(item.id, "add");
-                            updateCartDetails(item.id);
+                            updateCartDetails(item.id, "add");
                           }}
                         />
                       </IconButton>

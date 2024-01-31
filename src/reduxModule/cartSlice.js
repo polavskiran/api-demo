@@ -17,7 +17,7 @@ export const addProductToCart = createAsyncThunk(
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        userId: 2,
+        userId: 20,
         products: [...products],
       }),
     })
@@ -27,6 +27,20 @@ export const addProductToCart = createAsyncThunk(
     return resp;
   }
 );
+
+export const deleteProductFromCart = createAsyncThunk(
+  "products/delete-product",
+  async({productid}) => {
+    const resp = fetch(`https://dummyjson.com/carts/${productid}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    }).then((res) => res.json())
+    .catch((err) => console.log(err));
+
+    console.log("Delete Resp= ", resp);
+    return resp;
+  }
+)
 
 export const cartSlice = createSlice({
   name: "cart",
@@ -80,6 +94,13 @@ export const cartSlice = createSlice({
 
       if (existingCart.length === 0) {
         state.cart = [{ ...objResponse }];
+        const productDetails = getProductDetails(
+          [...objResponse[objKey].products]
+        );
+        state.totalPrice = productDetails?.totalPrice;
+        state.totalQuantity = productDetails?.totalQuantity;
+        state.discountedTotal = productDetails?.discountedTotal;
+        state.totalProducts = productDetails?.totalProducts;
       } else {
         let updatedObject = {};
         existingCart.forEach((obj, index, array) => {

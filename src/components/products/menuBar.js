@@ -24,12 +24,12 @@ export const MenuBar = () => {
   const cartItems = useSelector((state) => state.cart.totalQuantity);
   const dispatch = useDispatch();
   const token = localStorage.getItem("authToken");
+  const loginLink = !token ? "/auth?mode=login" : "/logout";
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const categories = useSelector((state) => state.products.categories);
   const openCartDialog = useSelector((state) => state.cart.openDialog);
   const catItems = useSelector((state) => state.cart.cart);
-  console.log("catItems= ",catItems);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -99,9 +99,16 @@ export const MenuBar = () => {
                 Recipes
               </NavLink>
             </Typography>
-            <NavLink style={{ color: "#fff" }} to="/auth?mode=login">
-              Login
-            </NavLink>
+            {token ? (
+              <Form method="post" action="/logout">
+                <Button style={{ color: "#fff" }} type="submit">Logout</Button>
+              </Form>
+            ) : (
+              <NavLink style={{ color: "#fff" }} to="auth?mode=login">
+                {"Login"}
+              </NavLink>
+            )}
+
             <IconButton
               color="#fff"
               aria-label="add to shopping cart"
@@ -112,7 +119,10 @@ export const MenuBar = () => {
                 {/* <Link to="/shopping-cart" variant="body1">
                   <AddShoppingCartIcon sx={{ color: "darkgray" }} />
                 </Link> */}
-                <AddShoppingCartIcon sx={{ color: "darkgray" }} onClick={() => dispatch(setOpenDialog(true))}/>
+                <AddShoppingCartIcon
+                  sx={{ color: "darkgray" }}
+                  onClick={() => dispatch(setOpenDialog(true))}
+                />
               </Badge>
             </IconButton>
           </Toolbar>
